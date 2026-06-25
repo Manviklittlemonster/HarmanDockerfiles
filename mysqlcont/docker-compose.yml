@@ -1,0 +1,31 @@
+services:
+  mysqldb:
+   image: 'mysql:latest'
+   environment:
+     - MYSQL_ROOT_PASSWORD=root
+     - MYSQL_DATABASE=harman
+   container_name: "mysqldb"
+   networks:
+    - harman-net
+   
+   healthcheck:
+      test: ['CMD','mysqladmin','ping','-h','localhost']
+      timeout: 20s
+      retries: 10
+  
+  mypythonapp:
+    build: ./
+    container_name: mypythonapp
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    networks:
+      - harman-net 
+    volumes:
+    - ./servers.txt:/app/servers.txt   
+    stdin_open: true
+    tty: true  
+    
+networks:
+  harman-net:
+  
